@@ -43,24 +43,26 @@ RUN mkdir /composer && chown -R www-data:www-data /composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && composer clear-cache && composer self-update
 
-RUN chown www-data:www-data .
+ARG project_name
+
+RUN mkdir -p /var/www/$project_name && chown www-data:www-data /var/www/$project_name
 
 # Initialize application
-WORKDIR .
+WORKDIR /var/www/$project_name
 
-#COPY --chown=www-data . /app
+COPY --chown=www-data . /var/www/$project_name
 
 # Install composer && global asset plugin (Yii 2.0 requirement)
 ENV COMPOSER_HOME /composer
 ENV PATH /composer/vendor/bin:$PATH
 
-#RUN if [ "$context" = "dev" ] ; \
-#    then \
-#        echo Skip composer on the dev context ; \
-#    else \
-#        cd /app \
-#         && composer install --no-dev \
-#         && chown -R www-data:www-data vendor \
-#    ; fi
+RUN if [ "$context" = "dev" ] ; \
+    then \
+        echo Skip composer on the dev context ; \
+    else \
+        cd /var/www/$project_name \
+         && composer install --no-dev \
+         && chown -R www-data:www-data vendor \
+    ; fi
 
 CMD ["php-fpm"]

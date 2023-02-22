@@ -1,11 +1,5 @@
 version: '3.5'
 
-# Networks
-networks:
-  yii2-gb-network:
-    name: yii2-gb-network
-    driver: bridge
-
 # Services
 services:
   # nginx service
@@ -65,3 +59,13 @@ services:
 #      - ./.docker/mysql/dumps/${DUMP_FILE}:/docker-entrypoint-initdb.d/dump.sql
     networks:
       - yii2-gb-network
+
+# Networks
+networks:
+  yii2-gb-network:
+    name: yii2-gb-network
+    driver: bridge
+
+# Volumes
+volumes:
+  yii2-gb:

@@ -22,7 +22,7 @@ services:
       - yii2-gb-network
   # app service
   # При первой настройке обновляем composer.
-  # 1. docker container exec -it php-fpm /bin/bash
+  # 1. docker container exec -it yii2-gb_app /bin/bash
   # 2. composer self-update && composer update && composer cc && composer validate
   app:
     user: www-data
@@ -36,7 +36,8 @@ services:
     restart: unless-stopped
     tty: true
     volumes:
-      - .:/var/www/${PROJECT_NAME}
+      - .:/var/www/yii2-gb
+      - .docker/app/custom.d/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
     depends_on:
       - db
     networks:

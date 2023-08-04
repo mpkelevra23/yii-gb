@@ -4,7 +4,7 @@ version: '3.5'
 services:
   # nginx service
   nginx:
-    image: nginx:1.23.3
+    image: nginx:1.25
     container_name: ${PROJECT_NAME}_nginx
     ports:
       - ${PROJECT_PORT}:80

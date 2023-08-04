@@ -6,12 +6,18 @@ use app\components\ActivityComponent;
 use app\models\Activity;
 use yii\base\Action;
 use Yii;
+use yii\base\InvalidConfigException;
 
 class ActivityCreateAction extends Action
 {
-    public function run()
+    /**
+     * @throws InvalidConfigException
+     */
+    public function run(): string
     {
         /**
+         * Можно вызвать компонент через сервис локатор так как он зарегистрирован в components в файле config/web.php
+         * или создать компонент через Yii::createObject
          * @var ActivityComponent $component
          */
 //        $component = Yii::$app->activity;
@@ -24,13 +30,7 @@ class ActivityCreateAction extends Action
             $activity = $component->getModel();
         }
 
-//        $activity = new Activity();
-//        $activity->is_blocked = true;
-//        $activity->title = 'title';
-
         return $this->controller->render('create', ['activity' => $activity]);
-
-
     }
 
 }

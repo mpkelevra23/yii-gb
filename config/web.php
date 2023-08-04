@@ -1,5 +1,14 @@
 <?php
 
+use app\components\ActivityComponent;
+use yii\log\FileTarget;
+use yii\debug\Module;
+use yii\caching\FileCache;
+use app\models\Activity;
+use yii\symfonymailer\Mailer;
+use app\modules\logs\Module as Logs;
+use yii\gii\Module as Gii;
+
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
@@ -12,17 +21,23 @@ $config = [
         '@bower' => '@vendor/bower-asset',
         '@npm' => '@vendor/npm-asset',
     ],
+    // TODO Модуль для работы с логами, добавлен как пример, пока что он пуст
+    'modules' => [
+        'logs' => [
+            'class' => Logs::class,
+        ],
+    ],
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'Tm02UZ7G25FH87JBS8YkqByYl8uEhKXI',
         ],
         'activity' => [
-            'class' => \app\components\ActivityComponent::class,
-            'activity_class' => 'app\models\Activity'
+            'class' => ActivityComponent::class,
+            'activity_class' => Activity::class
         ],
         'cache' => [
-            'class' => 'yii\caching\FileCache',
+            'class' => FileCache::class,
         ],
         'user' => [
             'identityClass' => 'app\models\User',
@@ -32,7 +47,7 @@ $config = [
             'errorAction' => 'site/error',
         ],
         'mailer' => [
-            'class' => \yii\symfonymailer\Mailer::class,
+            'class' => Mailer::class,
             'viewPath' => '@app/mail',
             // send all mails to a file by default.
             'useFileTransport' => true,
@@ -41,7 +56,7 @@ $config = [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
                 [
-                    'class' => 'yii\log\FileTarget',
+                    'class' => FileTarget::class,
                     'levels' => ['error', 'warning'],
                 ],
             ],
@@ -61,16 +76,17 @@ if (YII_ENV_DEV) {
     // configuration adjustments for 'dev' environment
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug'] = [
-        'class' => 'yii\debug\Module',
+        'class' => Module::class,
         // uncomment the following to add your IP if you are not connecting from localhost.
         'allowedIPs' => ['*'],
     ];
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
-        'class' => 'yii\gii\Module',
+        'class' => Gii::class,
         // uncomment the following to add your IP if you are not connecting from localhost.
-        'allowedIPs' => ['127.0.0.1', '::1', '172.24.0.1'],
+        'allowedIPs' => ['127.0.0.1', '::1', '172.19.0.1'],
+//        'allowedIPs' => ['*'],
     ];
 }
 

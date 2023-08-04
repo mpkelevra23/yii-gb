@@ -15,10 +15,17 @@ use yii\jui\DatePicker;
             'method' => 'post',
             'id' => 'activity'
         ]) ?>
+        <?= $form->errorSummary($activity) ?>
         <?= $form->field($activity, 'title') ?>
         <?= $form->field($activity, 'description')->textarea(['rows' => 5]) ?>
         <?= $form->field($activity, 'is_blocked')->checkbox() ?>
-        <?= $form->field($activity, 'date_start')->widget(DatePicker::class, [
+        <?= $form->field($activity, 'is_repeat')->checkbox() ?>
+        <?= $form->field($activity, 'start_day')->widget(DatePicker::class, [
+            'language' => 'ru',
+            'dateFormat' => 'yyyy-MM-dd',
+            'options' => ['class' => 'form-control'],
+        ]); ?>
+        <?= $form->field($activity, 'end_day')->widget(DatePicker::class, [
             'language' => 'ru',
             'dateFormat' => 'yyyy-MM-dd',
             'options' => ['class' => 'form-control'],

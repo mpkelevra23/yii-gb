@@ -2,21 +2,28 @@
 
 namespace app\models;
 
-use app\models\rules\EndDayAfterStartDayRule;
 use DateTime;
 use yii\base\Model;
 use yii\web\UploadedFile;
+use function PHPUnit\Framework\isFalse;
 
+/**
+ * Модель для работы с активностями.
+ *
+ * @property string $title Название события
+ * @property DateTime $start_day День начала события
+ * @property DateTime $end_day День завершения события
+ * @property int $id_author ID автора, создавшего событие
+ * @property string $description Описание события
+ * @property bool $is_blocked Блокирующее событие
+ * @property bool $is_repeat Повторяющееся событие
+ * @property string $email Email
+ * @property string $email_confirm Подтверждение Email
+ * @property bool $use_notification Поле уведомлений
+ * @property UploadedFile[] $images Изображения
+ */
 class Activity extends Model
 {
-    /**
-     * Сценарий при создании активности
-     */
-    const SCENARIO_CREATE = 'create';
-    /**
-     * Сценарий при обновлении активности
-     */
-    const SCENARIO_UPDATE = 'update';
     /**
      * Название события
      *
@@ -78,12 +85,29 @@ class Activity extends Model
      */
     public $use_notification;
     /**
-     * Изображение
+     * Изображения
      *
-     * @var UploadedFile
+     * @var UploadedFile[]
      */
-    public $image;
+    public $images;
+    /**
+     * Сценарий при создании активности
+     */
+    const SCENARIO_CREATE = 'create';
 
+    /**
+     * Сценарий при обновлении активности
+     */
+    const SCENARIO_UPDATE = 'update';
+
+    /**
+     * Разрешенные расширения для изображений
+     */
+    const IMAGE_EXTENSIONS = ['png', 'jpg'];
+
+    /**
+     * {@inheritdoc}
+     */
     public function scenarios(): array
     {
         $scenarios = parent::scenarios();
@@ -100,7 +124,7 @@ class Activity extends Model
             'email',
             'email_confirm',
             'use_notification',
-            'image',
+            'images',
         ];
         $scenarios[self::SCENARIO_UPDATE] = [
             'title',
@@ -116,19 +140,42 @@ class Activity extends Model
     }
 
     /**
-     * Позволяет работать с данными до момента валидации.
-     * Пример преобразования даты в нужный формат.
      * @return bool
      */
     public function beforeValidate(): bool
     {
-        $this->upload();
-        if (!empty($this->start_day)) {
-            $this->start_day = DateTime::createFromFormat('Y-m-d', $this->start_day)->format('Y-m-d');
-        }
+        $this->uploadImages();
+        $this->transformStartDate();
         return parent::beforeValidate();
     }
 
+    /**
+     * Загрузка изображения перед валидацией.
+     *
+     * @return void
+     */
+    private function uploadImages(): void
+    {
+        $this->images = UploadedFile::getInstances($this, 'images');
+    }
+
+    /**
+     * Преобразование даты начала события.
+     *
+     * @return void
+     */
+    private function transformStartDate(): void
+    {
+        if (!empty($this->start_day)) {
+            $this->start_day = DateTime::createFromFormat('Y-m-d', $this->start_day)->format('Y-m-d');
+        }
+    }
+
+    /**
+     * Правила валидации для модели Activity.
+     *
+     * @return array
+     */
     public function rules(): array
     {
         return [
@@ -140,7 +187,7 @@ class Activity extends Model
             [['email', 'email_confirm'], 'required', 'when' => function ($model) {
                 return (bool)$model->use_notification;
             }],
-            [['image'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg'],
+            [['images'], 'file', 'skipOnEmpty' => true, 'extensions' => implode(', ', self::IMAGE_EXTENSIONS), 'maxFiles' => 3],
             ['email_confirm', 'compare', 'compareAttribute' => 'email', 'message' => 'Почтовый адрес не совпадает'],
             [['start_day', 'end_day'], 'datetime', 'format' => 'yyyy-MM-dd', 'message' => 'Формат даты должен быть yyyy-MM-dd'],
             ['end_day', 'compare', 'compareAttribute' => 'start_day', 'operator' => '>='],
@@ -150,6 +197,9 @@ class Activity extends Model
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public function attributeLabels(): array
     {
         return [
@@ -159,30 +209,22 @@ class Activity extends Model
             'id_author' => 'ID автора',
             'description' => 'Описание события',
             'is_blocked' => 'Блокирующее событие',
-            'is_repeat' => 'Повторяющиеся событие',
-            'email' => 'Почтовый адрес',
-            'email_confirm' => 'Повторите почтовый адрес',
+            'is_repeat' => 'Повторяющееся событие',
+            'email' => 'Адрес электронной почты',
+            'email_confirm' => 'Повторите а дрес электронной почты',
             'use_notification' => 'Получать уведомления на почтовый адрес?',
-            'image' => 'Изображение',
+            'images' => 'Изображение',
         ];
     }
 
-
-    public function upload(): void
-    {
-        $this->image = UploadedFile::getInstance($this, 'image');
-    }
-
     /**
-     * Можно добавить кастомный валидатор для сравнения даты начала и даты конца события,
-     * можно использовать, но лучше прописать такое с помощью CompareValidator.
-     * Или добавить класс в models/rules и наследоваться от yii\validators\Validator
+     * Валидация даты завершения после даты начала.
      *
      * @param $attribute
      * @param $params
      * @return void
      */
-    public function validateEndDayAfterStartDay($attribute, $params)
+    public function validateEndDayAfterStartDay($attribute, $params): void
     {
         if ($this->end_day <= $this->start_day) {
             $this->addError($attribute, 'Дата завершения не может быть раньше даты начала.');

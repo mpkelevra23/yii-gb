@@ -5,18 +5,22 @@
 
 use app\models\Activity;
 use yii\bootstrap5\ActiveForm;
+use yii\helpers\Html;
 use yii\jui\DatePicker;
 
 ?>
 <div class="row">
     <div class="col-md-6">
-        <h2>Create new activity</h2>
+        <h2>Создать новую активность</h2>
         <?php $form = ActiveForm::begin([
             // Можно настроить ajax валидацию на всю форму, на каждое поле
 //            'fieldConfig' => ['enableAjaxValidation' => true],
+            'options' => ['enctype' => 'multipart/form-data'],
             'method' => 'post',
             'id' => 'activity'
         ]) ?>
+        <!--        Задать адрес обработки формы-->
+        <!--        --><?php //= $form->action = Url::to(['activity/create']) ?>
         <?= $form->errorSummary($activity) ?>
         <?= $form->field($activity, 'title') ?>
         <?= $form->field($activity, 'description')->textarea(['rows' => 5]) ?>
@@ -25,12 +29,14 @@ use yii\jui\DatePicker;
             [
                 'enableAjaxValidation' => true,
                 'enableClientValidation' => false
-            ]) ?>
+            ])
+        ?>
         <?= $form->field($activity, 'email_confirm',
             [
                 'enableAjaxValidation' => true,
                 'enableClientValidation' => false
-            ]) ?>
+            ])
+        ?>
         <?= $form->field($activity, 'is_blocked')->checkbox() ?>
         <?= $form->field($activity, 'is_repeat')->checkbox() ?>
         <?= $form->field($activity, 'start_day')->widget(DatePicker::class, [
@@ -41,7 +47,7 @@ use yii\jui\DatePicker;
                     'class' => 'form-control',
                     'autocomplete' => 'off'
                 ],
-        ]); ?>
+        ]) ?>
         <?= $form->field($activity, 'end_day')->widget(DatePicker::class, [
             'language' => 'ru',
             'dateFormat' => 'yyyy-MM-dd',
@@ -50,9 +56,9 @@ use yii\jui\DatePicker;
                     'class' => 'form-control',
                     'autocomplete' => 'off'
                 ],
-        ]); ?>
-        <?= $form->field($activity, 'image')->fileInput() ?>
-        <button type="submit" class="btn btn-primary">Отправить</button>
+        ]) ?>
+        <?= $form->field($activity, 'images[]')->fileInput(['multiple' => true]) ?>
+        <?= Html::submitButton('Отправить', ['class' => 'btn btn-primary']) ?>
         <?php ActiveForm::end() ?>
     </div>
 </div>

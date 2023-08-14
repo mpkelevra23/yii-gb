@@ -2,10 +2,10 @@
 
 namespace app\models;
 
+use app\models\rules\EndDayAfterStartDayRule;
 use DateTime;
 use yii\base\Model;
 use yii\web\UploadedFile;
-use function PHPUnit\Framework\isFalse;
 
 /**
  * Модель для работы с активностями.

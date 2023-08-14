@@ -7,8 +7,8 @@ use Yii;
 use yii\base\Component;
 use yii\base\Exception;
 use yii\web\Response;
-use yii\web\UploadedFile;
 use yii\widgets\ActiveForm;
+use yii\web\UploadedFile;
 
 class ActivityComponent extends Component
 {
@@ -27,9 +27,9 @@ class ActivityComponent extends Component
         }
     }
 
-
     /**
-     * @param $params
+     * Создает новую модель активности с заданными параметрами.
+     * @param null $params Параметры модели
      * @return Activity
      */
     public function getModel($params = null): Activity
@@ -46,44 +46,74 @@ class ActivityComponent extends Component
     }
 
     /**
-     * @param Activity $activity
-     * @return bool
+     * Создает новую активность и сохраняет изображение, если оно предоставлено.
+     * @param Activity $activity Модель активности
+     * @return bool Успешно ли создана активность и сохранено изображение
      * @throws \Exception
      */
     public function createActivity(Activity $activity): bool
     {
         $activity->setScenario($activity::SCENARIO_CREATE);
+
         if ($activity->validate()) {
-            $path = $this->getSaveFilePath($activity);
-            $name = random_int(0, 9999) . time() . '.' . $activity->image->getExtension();
-            if (!$activity->image->saveAs($path . $name)) {
-                $activity->addError('image', 'Файл не удалось переместить');
+            if ($activity->images && !$this->uploadFile($activity)) {
+                $activity->addError('images', 'Файл не удалось переместить');
                 return false;
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
-    //TODO Убрать это?
-//    private function uploadFile(Activity $activity): void
-//    {
-////        $activity->image = UploadedFile::getInstance($activity, 'image');
-//        $activity->image->saveAs('uploads/' . $activity->image->baseName . '.' . $activity->image->extension);
-//    }
+    /**
+     * Загружает файл изображения для активности.
+     * @param Activity $activity Модель активности
+     * @return bool Успешно ли загружено изображение
+     * @throws \Exception
+     */
+    private function uploadFile(Activity $activity): bool
+    {
+        try {
+            foreach ($activity->images as $image) {
+                $image->saveAs($this->getSaveFilePath() . $this->generateFileName($image));
+            }
+            return true;
+        } catch (Exception $exception) {
+            echo 'Ошибка при загрузке файла: ' . $exception->getMessage();
+            return false;
+        }
+    }
 
-    private function getSaveFilePath(&$activity)
+    /**
+     * Генерирует уникальное имя файла для сохранения изображения.
+     * @param UploadedFile $image Загруженное изображение
+     * @return string Уникальное имя файла
+     * @throws \Exception
+     */
+    private function generateFileName(UploadedFile $image): string
+    {
+        return random_int(0, 9999) . time() . '.' . $image->getExtension();
+    }
+
+    /**
+     * Возвращает путь к директории для сохранения файлов.
+     * @return string Путь к директории
+     */
+    private function getSaveFilePath(): string
     {
         return Yii::getAlias('@app/web/files/');
     }
 
     /**
-     * @param Activity $activity
-     * @return array
+     * Выполняет AJAX-валидацию модели активности.
+     * @param Activity $activity Модель активности для валидации
+     * @return array Результат валидации в формате JSON
      */
     public function ajaxValidation(Activity $activity): array
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
         $activity->setScenario($activity::SCENARIO_CREATE);
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
         return ActiveForm::validate($activity, ['email', 'email_confirm']);
     }
 }

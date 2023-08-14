@@ -1,8 +1,10 @@
 <?php
 
+use yii\db\Connection;
+
 return [
-    'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost:' . env('MYSQL_PORT') . ';dbname=' . env('PROJECT_NAME'),
+    'class' => Connection::class,
+    'dsn' => 'mysql:host=' . env('PROJECT_NAME') . '_db;dbname=' . env('PROJECT_NAME'),
     'username' => env('MYSQL_USERNAME', 'root'),
     'password' => env('MYSQL_PASSWORD'),
     'charset' => 'utf8',

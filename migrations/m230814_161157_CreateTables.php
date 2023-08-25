@@ -31,7 +31,7 @@ class m230814_161157_CreateTables extends Migration
         $this->createTable('users',
             [
                 'id' => $this->primaryKey(),
-                'email' => $this->string(150)->notNull(),
+                'email' => $this->string(150)->unique()->notNull(),
                 'password_hash' => $this->string(300)->notNull(),
                 'token' => $this->string(300)->notNull(),
                 'date_created' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP')

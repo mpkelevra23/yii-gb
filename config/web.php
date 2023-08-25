@@ -1,13 +1,14 @@
 <?php
 
 use app\components\ActivityComponent;
-use yii\log\FileTarget;
-use yii\debug\Module;
-use yii\caching\FileCache;
 use app\models\Activity;
-use yii\symfonymailer\Mailer;
+use app\models\dao\DAOComponent;
 use app\modules\logs\Module as Logs;
+use yii\caching\FileCache;
+use yii\debug\Module;
 use yii\gii\Module as Gii;
+use yii\log\FileTarget;
+use yii\symfonymailer\Mailer;
 
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
@@ -35,6 +36,9 @@ $config = [
         'activity' => [
             'class' => ActivityComponent::class,
             'activity_class' => Activity::class
+        ],
+        'dao' => [
+            'class' => DAOComponent::class,
         ],
         'cache' => [
             'class' => FileCache::class,
@@ -85,8 +89,7 @@ if (YII_ENV_DEV) {
     $config['modules']['gii'] = [
         'class' => Gii::class,
         // uncomment the following to add your IP if you are not connecting from localhost.
-        'allowedIPs' => ['127.0.0.1', '::1', '172.19.0.1'],
-//        'allowedIPs' => ['*'],
+        'allowedIPs' => ['*'],
     ];
 }
 

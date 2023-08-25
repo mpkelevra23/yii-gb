@@ -6,10 +6,14 @@ use yii\validators\Validator;
 
 class EndDayAfterStartDayRule extends Validator
 {
-
+    /**
+     * @param $model
+     * @param $attribute
+     * @return void
+     */
     public function validateAttribute($model, $attribute)
     {
-        if ($model->end_day <= $model->start_day) {
+        if ($model->end <= $model->start_day) {
             $this->addError($model, $attribute, 'Дата завершения не может быть раньше даты начала.');
         }
     }

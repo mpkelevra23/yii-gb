@@ -9,9 +9,9 @@ RUN echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/02apt-speedup
 # we don't need an apt cache in a container
 RUN echo "Acquire::http {No-Cache=True;};" > /etc/apt/apt.conf.d/no-cache
 
-RUN apt-get update && apt-get install -y postgresql-client libpq-dev libmcrypt-dev &&  \
-    docker-php-ext-install pdo_pgsql bcmath sockets && \
-    docker-php-ext-enable pdo_pgsql bcmath &&  \
+RUN apt-get update && apt-get install -y default-mysql-client libmcrypt-dev &&  \
+    docker-php-ext-install pdo_mysql bcmath sockets && \
+    docker-php-ext-enable pdo_mysql bcmath &&  \
     pecl install mcrypt-1.0.4 xdebug-3.1.6 &&  \
     docker-php-ext-enable mcrypt xdebug
 

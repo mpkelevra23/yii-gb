@@ -2,10 +2,10 @@
 
 namespace app\models;
 
+use app\models\rules\EndDayAfterStartDayRule;
 use DateTime;
 use yii\base\Model;
 use yii\web\UploadedFile;
-use function PHPUnit\Framework\isFalse;
 
 /**
  * Модель для работы с активностями.
@@ -13,7 +13,7 @@ use function PHPUnit\Framework\isFalse;
  * @property string $title Название события
  * @property DateTime $start_day День начала события
  * @property DateTime $end_day День завершения события
- * @property int $id_author ID автора, создавшего событие
+ * @property int $user_id ID пользователя, создавшего событие
  * @property string $description Описание события
  * @property bool $is_blocked Блокирующее событие
  * @property bool $is_repeat Повторяющееся событие
@@ -43,11 +43,11 @@ class Activity extends Model
      */
     public $end_day;
     /**
-     * ID автора, создавшего события
+     * ID пользователя, создавшего события
      *
      * @var int
      */
-    public $id_author;
+    public $user_id;
     /**
      * Описание события
      *
@@ -117,7 +117,7 @@ class Activity extends Model
             'title',
             'start_day',
             'end_day',
-            'id_author',
+            'user_id',
             'description',
             'is_blocked',
             'is_repeat',
@@ -130,7 +130,7 @@ class Activity extends Model
             'title',
             'start_day',
             'end_day',
-            'id_author',
+            'user_id',
             'description',
             'is_blocked',
             'is_repeat',
@@ -206,12 +206,12 @@ class Activity extends Model
             'title' => 'Название события',
             'start_day' => 'Дата начала',
             'end_day' => 'Дата завершения',
-            'id_author' => 'ID автора',
+            'user_id' => 'ID автора',
             'description' => 'Описание события',
             'is_blocked' => 'Блокирующее событие',
             'is_repeat' => 'Повторяющееся событие',
             'email' => 'Адрес электронной почты',
-            'email_confirm' => 'Повторите а дрес электронной почты',
+            'email_confirm' => 'Повторите адрес электронной почты',
             'use_notification' => 'Получать уведомления на почтовый адрес?',
             'images' => 'Изображение',
         ];

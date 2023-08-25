@@ -21,6 +21,8 @@ class Yii {
 /**
  * @property yii\rbac\DbManager $authManager 
  * @property \yii\web\User|__WebUser $user
+ * Добавления автокомплита для IDE
+ * @property \app\models\dao\DAOComponent $dao
  * 
  */
 class __Application {
